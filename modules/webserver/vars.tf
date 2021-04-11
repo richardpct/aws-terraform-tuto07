@@ -29,7 +29,3 @@ variable "image_id" {
 variable "instance_type" {
   description = "instance type"
 }
-
-variable "database_pass" {
-  description = "redis password"
-}

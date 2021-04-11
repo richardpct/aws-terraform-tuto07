@@ -11,6 +11,6 @@ module "base" {
   subnet_public_a  = "10.0.0.0/24"
   subnet_public_b  = "10.0.1.0/24"
   subnet_private   = "10.0.2.0/24"
-  cidr_allowed_ssh = "${var.my_ip_address}"
-  ssh_public_key   = "${var.ssh_public_key}"
+  cidr_allowed_ssh = var.my_ip_address
+  ssh_public_key   = var.ssh_public_key
 }

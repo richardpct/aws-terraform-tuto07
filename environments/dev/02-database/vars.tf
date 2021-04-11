@@ -5,7 +5,3 @@ variable "bucket" {
 variable "dev_base_key" {
   description = "terraform state for dev environment"
 }
-
-variable "dev_database_pass" {
-  description = "redis password"
-}

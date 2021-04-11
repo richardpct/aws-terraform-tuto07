@@ -9,7 +9,3 @@ variable "dev_base_key" {
 variable "dev_database_key" {
   description = "terraform state for dev environment"
 }
-
-variable "dev_database_pass" {
-  description = "redis password"
-}

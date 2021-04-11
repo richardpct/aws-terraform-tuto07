@@ -1,9 +1,9 @@
-// Rules for Bastion
+# Rules for Bastion
 resource "aws_security_group" "bastion" {
   name   = "sg_bastion-${var.env}"
-  vpc_id = "${aws_vpc.my_vpc.id}"
+  vpc_id = aws_vpc.my_vpc.id
 
-  tags {
+  tags = {
     Name = "bastion_sg-${var.env}"
   }
 }
@@ -13,8 +13,8 @@ resource "aws_security_group_rule" "bastion_inbound_ssh" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_allowed_ssh}"]
-  security_group_id = "${aws_security_group.bastion.id}"
+  cidr_blocks       = [var.cidr_allowed_ssh]
+  security_group_id = aws_security_group.bastion.id
 }
 
 resource "aws_security_group_rule" "bastion_outbound_ssh" {
@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "bastion_outbound_ssh" {
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.bastion.id}"
+  security_group_id = aws_security_group.bastion.id
 }
 
 resource "aws_security_group_rule" "bastion_outbound_http" {
@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "bastion_outbound_http" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.bastion.id}"
+  security_group_id = aws_security_group.bastion.id
 }
 
 resource "aws_security_group_rule" "bastion_outbound_https" {
@@ -41,26 +41,17 @@ resource "aws_security_group_rule" "bastion_outbound_https" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.bastion.id}"
+  security_group_id = aws_security_group.bastion.id
 }
 
-// Rules for DataBase
+# Rules for DataBase
 resource "aws_security_group" "database" {
   name   = "sg_database-${var.env}"
-  vpc_id = "${aws_vpc.my_vpc.id}"
+  vpc_id = aws_vpc.my_vpc.id
 
-  tags {
+  tags = {
     Name = "database_sg-${var.env}"
   }
-}
-
-resource "aws_security_group_rule" "database_inbound_ssh" {
-  type                     = "ingress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.bastion.id}"
-  security_group_id        = "${aws_security_group.database.id}"
 }
 
 resource "aws_security_group_rule" "database_inbound_redis" {
@@ -68,34 +59,16 @@ resource "aws_security_group_rule" "database_inbound_redis" {
   from_port                = 6379
   to_port                  = 6379
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.webserver.id}"
-  security_group_id        = "${aws_security_group.database.id}"
+  source_security_group_id = aws_security_group.webserver.id
+  security_group_id        = aws_security_group.database.id
 }
 
-resource "aws_security_group_rule" "database_outbound_http" {
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.database.id}"
-}
-
-resource "aws_security_group_rule" "database_outbound_https" {
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.database.id}"
-}
-
-// Rules for alb web
+# Rules for alb web
 resource "aws_security_group" "alb_web" {
   name   = "sg_alb_web-${var.env}"
-  vpc_id = "${aws_vpc.my_vpc.id}"
+  vpc_id = aws_vpc.my_vpc.id
 
-  tags {
+  tags = {
     Name = "alb_web_sg-${var.env}"
   }
 }
@@ -106,24 +79,24 @@ resource "aws_security_group_rule" "alb_web_inbound_http" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.alb_web.id}"
+  security_group_id = aws_security_group.alb_web.id
 }
 
 resource "aws_security_group_rule" "alb_web_outbound_http" {
   type                     = "egress"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = 8000
+  to_port                  = 8000
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.webserver.id}"
-  security_group_id        = "${aws_security_group.alb_web.id}"
+  source_security_group_id = aws_security_group.webserver.id
+  security_group_id        = aws_security_group.alb_web.id
 }
 
-// Rules for WebServer
+# Rules for WebServer
 resource "aws_security_group" "webserver" {
   name   = "sg_webserver-${var.env}"
-  vpc_id = "${aws_vpc.my_vpc.id}"
+  vpc_id = aws_vpc.my_vpc.id
 
-  tags {
+  tags = {
     Name = "webserver_sg-${var.env}"
   }
 }
@@ -133,17 +106,17 @@ resource "aws_security_group_rule" "webserver_inbound_ssh" {
   from_port                = 22
   to_port                  = 22
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.bastion.id}"
-  security_group_id        = "${aws_security_group.webserver.id}"
+  source_security_group_id = aws_security_group.bastion.id
+  security_group_id        = aws_security_group.webserver.id
 }
 
 resource "aws_security_group_rule" "webserver_inbound_http" {
   type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = 8000
+  to_port                  = 8000
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.alb_web.id}"
-  security_group_id        = "${aws_security_group.webserver.id}"
+  source_security_group_id = aws_security_group.alb_web.id
+  security_group_id        = aws_security_group.webserver.id
 }
 
 resource "aws_security_group_rule" "webserver_outbound_http" {
@@ -152,7 +125,7 @@ resource "aws_security_group_rule" "webserver_outbound_http" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.webserver.id}"
+  security_group_id = aws_security_group.webserver.id
 }
 
 resource "aws_security_group_rule" "webserver_outbound_https" {
@@ -161,7 +134,7 @@ resource "aws_security_group_rule" "webserver_outbound_https" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.webserver.id}"
+  security_group_id = aws_security_group.webserver.id
 }
 
 resource "aws_security_group_rule" "webserver_outbound_redis" {
@@ -169,6 +142,6 @@ resource "aws_security_group_rule" "webserver_outbound_redis" {
   from_port                = 6379
   to_port                  = 6379
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.database.id}"
-  security_group_id        = "${aws_security_group.webserver.id}"
+  source_security_group_id = aws_security_group.database.id
+  security_group_id        = aws_security_group.webserver.id
 }

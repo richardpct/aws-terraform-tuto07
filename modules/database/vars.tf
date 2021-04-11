@@ -14,14 +14,6 @@ variable "base_remote_state_key" {
   description = "base key"
 }
 
-variable "image_id" {
-  description = "image id"
-}
-
 variable "instance_type" {
   description = "instance type"
-}
-
-variable "database_pass" {
-  description = "redis password"
 }
