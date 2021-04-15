@@ -16,7 +16,7 @@ resource "aws_lb_target_group" "web" {
     unhealthy_threshold = 2
     timeout             = 3
     interval            = 30
-    path                = "/cgi-bin/hello.py"
+    path                = "/cgi-bin/ping.py"
   }
 }
 

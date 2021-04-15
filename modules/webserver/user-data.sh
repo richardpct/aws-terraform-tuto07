@@ -28,6 +28,17 @@ print("<p>Hello World!<br />counter: " + str(count) + "<br />env: ${environment}
 print("</body></html>")
 EOF
 
+cat << EOF > /var/lib/www/cgi-bin/ping.py
+#!/usr/bin/env python3
+
+print("Content-type: text/html")
+print("")
+print("<html><body>")
+print("<p>ok</p>")
+print("</body></html>")
+EOF
+
 chmod 755 /var/lib/www/cgi-bin/hello.py
+chmod 755 /var/lib/www/cgi-bin/ping.py
 cd /var/lib/www
 sudo -u www python3 -m http.server 8000 --cgi
