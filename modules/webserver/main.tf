@@ -22,7 +22,7 @@ data "terraform_remote_state" "database" {
   }
 }
 
-data "aws_availability_zones" "available" {}
+#data "aws_availability_zones" "available" {}
 
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
@@ -51,8 +51,7 @@ resource "aws_launch_configuration" "web" {
 resource "aws_autoscaling_group" "web" {
   name                 = "asg_web-${var.env}"
   launch_configuration = aws_launch_configuration.web.id
-  vpc_zone_identifier  = [data.terraform_remote_state.base.outputs.subnet_public_a_id, data.terraform_remote_state.base.outputs.subnet_public_b_id]
-
+  vpc_zone_identifier  = [data.terraform_remote_state.base.outputs.subnet_private_web_a_id, data.terraform_remote_state.base.outputs.subnet_private_web_b_id]
   target_group_arns    = [data.terraform_remote_state.base.outputs.alb_target_group_web_arn]
   health_check_type    = "ELB"
 

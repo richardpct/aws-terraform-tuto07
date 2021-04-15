@@ -14,7 +14,7 @@ data "terraform_remote_state" "base" {
 
 resource "aws_elasticache_subnet_group" "redis" {
   name       = "subnet-redis-${var.env}"
-  subnet_ids = [data.terraform_remote_state.base.outputs.subnet_private_id]
+  subnet_ids = [data.terraform_remote_state.base.outputs.subnet_private_redis_a_id, data.terraform_remote_state.base.outputs.subnet_private_redis_b_id]
 }
 
 resource "aws_elasticache_cluster" "redis" {
