@@ -12,8 +12,6 @@ data "terraform_remote_state" "base" {
   }
 }
 
-#data "aws_availability_zones" "available" {}
-
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 
@@ -40,7 +38,6 @@ resource "aws_launch_configuration" "bastion" {
 resource "aws_autoscaling_group" "bastion" {
   name                 = "asg_bastion-${var.env}"
   launch_configuration = aws_launch_configuration.bastion.id
-#  availability_zones   = data.aws_availability_zones.available.names
   vpc_zone_identifier  = [data.terraform_remote_state.base.outputs.subnet_public_bastion_a_id, data.terraform_remote_state.base.outputs.subnet_public_bastion_b_id]
   min_size             = 1
   max_size             = 1

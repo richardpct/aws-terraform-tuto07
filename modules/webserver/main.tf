@@ -22,8 +22,6 @@ data "terraform_remote_state" "database" {
   }
 }
 
-#data "aws_availability_zones" "available" {}
-
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 

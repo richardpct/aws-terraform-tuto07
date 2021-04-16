@@ -9,6 +9,7 @@ sudo yum -y install python38
 sudo pip-3.8 install redis
 sudo useradd www -s /sbin/nologin
 mkdir -p /var/lib/www/cgi-bin
+INSTANCE_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
 
 cat << EOF > /var/lib/www/cgi-bin/hello.py
 #!/usr/bin/env python3
@@ -25,6 +26,7 @@ print("Content-type: text/html")
 print("")
 print("<html><body>")
 print("<p>Hello World!<br />counter: " + str(count) + "<br />env: ${environment}</p>")
+print("Id: $INSTANCE_ID")
 print("</body></html>")
 EOF
 
