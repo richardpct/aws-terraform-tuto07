@@ -9,8 +9,6 @@ data "terraform_remote_state" "network" {
   }
 }
 
-data "aws_availability_zones" "available" {}
-
 data "aws_ami" "amazonlinux" {
   most_recent = true
 
