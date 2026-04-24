@@ -30,8 +30,16 @@ output "aws_eip_bastion_id" {
   value = aws_eip.bastion.id
 }
 
+output "aws_eip_bastion_ip" {
+  value = aws_eip.bastion.public_ip
+}
+
 output "alb_target_group_web_arn" {
   value = aws_lb_target_group.web.arn
+}
+
+output "alb_web_dns" {
+  value = aws_lb.web.dns_name
 }
 
 output "iam_instance_profile_name" {

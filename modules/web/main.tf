@@ -42,13 +42,13 @@ resource "aws_launch_template" "web" {
   user_data     = base64encode(templatefile("${path.module}/user-data.sh",
                                             { environment   = var.env,
                                               region        = var.region,
-                                              database_host = data.terraform_remote_state.database.outputs.database_private_ip }))
+                                              database_host = data.terraform_remote_state.database.outputs.database_arn }))
   instance_type = var.instance_type
   key_name      = data.terraform_remote_state.network.outputs.ssh_key
 
   network_interfaces {
     security_groups             = [data.terraform_remote_state.network.outputs.sg_web_id]
-    associate_public_ip_address = true
+    associate_public_ip_address = false
   }
 
   iam_instance_profile {
