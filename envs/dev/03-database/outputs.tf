@@ -1,3 +1,3 @@
-output "database_private_ip" {
+output "database_arn" {
   value = module.database.database_arn
 }

@@ -30,8 +30,16 @@ output "aws_eip_bastion_id" {
   value = module.network.aws_eip_bastion_id
 }
 
+output "aws_eip_bastion_ip" {
+  value = module.network.aws_eip_bastion_ip
+}
+
 output "alb_target_group_web_arn" {
   value = module.network.alb_target_group_web_arn
+}
+
+output "alb_web_dns" {
+  value = module.network.alb_web_dns
 }
 
 output "iam_instance_profile_name" {
