@@ -20,8 +20,6 @@ data "terraform_remote_state" "database" {
   }
 }
 
-data "aws_availability_zones" "available" {}
-
 data "aws_ami" "amazonlinux" {
   most_recent = true
 
