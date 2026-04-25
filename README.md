@@ -3,8 +3,8 @@
 This tutorial takes up the previous one
 [aws-terraform-tuto06](https://richardpct.github.io/post/2021/04/05/aws-with-terraform-tutorial-06/)
 by adding an ALB (Application Load Balancer) in front of 2 web servers for
-sharing the load between 2 web servers and having almost no downtime when a web
-server is failing.
+sharing the load between multiple  web servers and having almost no downtime
+when a web server is failing.
 
 The following figure depicts the infrastructure you will build:
 
@@ -35,12 +35,12 @@ module "network" {
 }
 ```
 
-As you can see each service is held into 3 subnets.<br />
+As you can see each service is associated to 3 subnets.<br />
 The load balancer, the Nat gateway and the bastion run in the public subnet
 whereas the web server and the redis server run in the private subnet.<br />
 Comparing the the last tutorial, I moved the web servers from public to private
-subnets, because they are no longer expose directly to the Internet, a load balancer
-is used in front of the web servers.
+subnets, because they don't need to be exposed directly to the Internet, instead 
+a load balancer is used in front of the web servers.
 
 #### modules/network/main.tf
 
@@ -48,7 +48,7 @@ We create a Nat Gateway in each Availability Zone, the private services (webserv
 and redis) located in the AZ-A will use the Nat Gateway in the same AZ-A,
 likewise the private services located in the AZ-B will use the Nat Gateway in AZ-B,
 and so on..., if a server is located in an unavailable AZ, it will be spin up
-an an another healthy AZ.
+in an another healthy AZ.
 
 ```
 resource "aws_eip" "nat" {
@@ -75,6 +75,33 @@ I remind you that the public subnets use a default route to the Internet
 Gateway whereas the private subnet use a default route to the Nat Gateway:
 
 ```
+resource "aws_route_table" "route_nat" {
+  count  = length(var.subnet_public_nat)
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.nat_gw[count.index].id
+  }
+
+  tags = {
+    Name = "default_route-${var.env}-${count.index}"
+  }
+}
+
+resource "aws_route_table" "route" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.my_igw.id
+  }
+
+  tags = {
+    Name = "custom_route-${var.env}"
+  }
+}
+
 resource "aws_route_table_association" "public_lb" {
   count          = length(var.subnet_public_lb)
   subnet_id      = aws_subnet.public_lb[count.index].id
@@ -100,9 +127,9 @@ resource "aws_route_table_association" "private_web" {
 }
 ```
 
-Except the Nat Gateway, only the bastion still require an Elastic IP, the web
-servers don't need it anymore because a public IP will automatically assign to
-the Load Balancer:
+The Nat Gateway and the bastion still require an Elastic IP, the web servers
+don't need it anymore because some publics IP will automatically assign to the
+Load Balancer:
 
 ```
 resource "aws_eip" "nat" {
@@ -140,9 +167,9 @@ resource "aws_lb" "web" {
 ```
 
 We define the behavior of our Load Balancer: it forwards the requests to the
-the web servers on port 8000, and check the health of our service by using the
-test page located at /cgi-bin/ping.py (you will see later how this script is created),
-and the Load Balancer listens the requests in port 80:
+web servers on port 8000, and check the health of our service by using the test
+page located at /cgi-bin/ping.py (you will see later how this script is created),
+and the Load Balancer listens the external requests on port 80:
 
 ```
 resource "aws_lb_target_group" "web" {
@@ -205,8 +232,8 @@ resource "aws_autoscaling_group" "web" {
 #### modules/web/user-data.sh
 
 I added a page located at /cgi-bin/ping.py for checking the health of the web
-servers, in addition I display the instance Id for knowing which web server
-is responding to the request:
+servers, in addition I display the instance ID for displaying which web server
+is responding to the requests:
 
 ```
 #!/usr/bin/env bash
@@ -313,16 +340,15 @@ service process:
 
 Wait for a while, then the Load Balancer will deregister the unhealthy instance,
 you now have only one instance accepting the requests.<br />
-
 If you make some requests to the load balancer, you will notice the service is
 still up and running because the Load Balancer has stopped to forward to the
-failed server, only the healthy server is used, and also the page returns the
-same instance ID (because the other one is out):
+failed server, only the healthy server receives the requests, and also the page
+returns the same instance ID (because the other one is out):
 
     $ curl http://load_balancer_DNS_NAME/cgi-bin/hello.py
 
 Wait for a while, then you will have 2 healthy instances because a new one has
-replaced the failed instance.
+replaced the failed instance, the page will display the 2 instances ID.
 
 ## Destroying your infrastructure
 
