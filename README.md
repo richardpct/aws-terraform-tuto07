@@ -311,7 +311,7 @@ Building:
     $ cd ../03-database
     $ make apply
     $ cd ../04-web
-    $ terraform apply
+    $ make apply
 
 ## Testing your infrastructure
 
